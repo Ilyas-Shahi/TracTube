@@ -3,7 +3,7 @@
   "name": "TracTube",
   "version": "1.0",
   "description": "Tractube - Distraction free youtube",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["https://*.youtube.com/*"],
   "content_scripts": [
     {

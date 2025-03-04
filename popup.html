@@ -1,14 +1,242 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Extension</title>
+    <title>TracTube</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <div class="container">
-      <h1>My Extension</h1>
-      <!-- Add your popup content here -->
+      <!-- Header with Logo and Theme Toggle -->
+      <div class="header">
+        <div class="logo">
+          <img src="icons/icon.png" alt="TracTube" class="logo-icon" />
+          <h1>TracTube</h1>
+        </div>
+        <button id="themeToggle" class="theme-toggle">
+          <img src="icons/dark-mode.svg" alt="Theme" class="theme-icon" />
+        </button>
+      </div>
+
+      <!-- Main Toggle -->
+      <div class="main-toggle-container">
+        <label class="switch-container">
+          <span class="switch-label">Enable/Disable Features</span>
+          <label class="switch">
+            <input type="checkbox" id="mainToggle" />
+            <span class="slider"></span>
+          </label>
+        </label>
+      </div>
+
+      <!-- Timer Section -->
+      <div class="timer-section">
+        <span class="timer-label">After</span>
+        <div class="timer-controls">
+          <select id="timerDuration">
+            <option value="0">Select time</option>
+            <option value="30">30 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="120">2 hours</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <select id="timerAction">
+          <option value="disable">Disable</option>
+          <option value="enable">Enable</option>
+        </select>
+      </div>
+
+      <div class="sections-container">
+        <!-- Feed Controls Section -->
+        <div class="section">
+          <div class="section-header">
+            <h2>Feed Controls</h2>
+            <div
+              class="collapse-btn"
+              role="button"
+              aria-label="Toggle section"
+            ></div>
+          </div>
+
+          <div class="section-content">
+            <label class="switch-container">
+              <span class="switch-label">Hide Home Feed</span>
+              <label class="switch">
+                <input type="checkbox" id="hideHomeFeed" />
+                <span class="slider"></span>
+              </label>
+            </label>
+            <label class="switch-container">
+              <span class="switch-label">Hide Top Tags</span>
+              <label class="switch">
+                <input type="checkbox" id="hideTopTags" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Thumbnail Controls Section -->
+        <div class="section">
+          <div class="section-header">
+            <h2>Thumbnail Controls</h2>
+            <div
+              class="collapse-btn"
+              role="button"
+              aria-label="Toggle section"
+            ></div>
+          </div>
+
+          <div class="section-content">
+            <label class="switch-container">
+              <span class="switch-label">Blur Thumbnails</span>
+              <label class="switch">
+                <input type="checkbox" id="blurThumbnails" />
+                <span class="slider"></span>
+              </label>
+            </label>
+            <label class="switch-container">
+              <span class="switch-label">Hide Thumbnails</span>
+              <label class="switch">
+                <input type="checkbox" id="hideThumbnails" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Shorts Controls Section -->
+        <div class="section">
+          <div class="section-header">
+            <h2>Shorts Controls</h2>
+            <div
+              class="collapse-btn"
+              role="button"
+              aria-label="Toggle section"
+            ></div>
+          </div>
+          <div class="section-content">
+            <label class="switch-container">
+              <span class="switch-label">Hide Shorts</span>
+              <label class="switch">
+                <input type="checkbox" id="hideShorts" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+        </div>
+
+        <!-- Video Controls Section -->
+        <div class="section">
+          <div class="section-header">
+            <h2>Video Controls</h2>
+            <div
+              class="collapse-btn"
+              role="button"
+              aria-label="Toggle section"
+            ></div>
+          </div>
+
+          <div class="section-content">
+            <label class="switch-container">
+              <span class="switch-label">Hide Related Videos</span>
+              <label class="switch">
+                <input type="checkbox" id="hideRelatedVideos" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Hide Comments</span>
+              <label class="switch">
+                <input type="checkbox" id="hideComments" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Remove Live Chat</span>
+              <label class="switch">
+                <input type="checkbox" id="removeLiveChat" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Disable Annotations</span>
+              <label class="switch">
+                <input type="checkbox" id="disableAnnotations" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Disable Autoplay</span>
+              <label class="switch">
+                <input type="checkbox" id="disableAutoplay" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Center Video & Hide Sidebar</span>
+              <label class="switch">
+                <input type="checkbox" id="centerVideo" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Hide Endscreen Cards</span>
+              <label class="switch">
+                <input type="checkbox" id="hideEndscreen" />
+                <span class="slider"></span>
+              </label>
+            </label>
+
+            <label class="switch-container">
+              <span class="switch-label">Hide Playlist</span>
+              <label class="switch">
+                <input type="checkbox" id="hidePlaylist" />
+                <span class="slider"></span>
+              </label>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-buttons">
+          <a
+            href="https://github.com/Ilyas-Shahi/TracTube/issues/new"
+            target="_blank"
+            class="footer-btn"
+          >
+            Request Feature
+          </a>
+          <a
+            href="https://github.com/Ilyas-Shahi/TracTube/issues"
+            target="_blank"
+            class="footer-btn"
+          >
+            Support
+          </a>
+        </div>
+        <a
+          href="https://www.buymeacoffee.com/ilyas.shahi"
+          target="_blank"
+          class="bmc-link"
+        >
+          <img
+            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+            alt="Buy Me A Coffee"
+            class="bmc-btn"
+          />
+        </a>
+      </div>
     </div>
+
     <script src="popup.js"></script>
   </body>
 </html>
