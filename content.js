@@ -89,6 +89,166 @@ function handleThumbnails() {
   });
 }
 
+// Shorts Handler
+function handleShorts() {
+  // Skip if main toggle is disabled or shorts feature is disabled
+  if (!featureStates.mainEnabled || !featureStates.hideShorts) {
+    // Restore shorts visibility
+    restoreShortsVisibility();
+    return;
+  }
+
+  // Hide shorts in sidebar navigation
+  const sidebarShortsTab = document.querySelector(
+    'ytd-guide-entry-renderer a[title="Shorts"]'
+  );
+  if (sidebarShortsTab) {
+    const sidebarShortsItem = sidebarShortsTab.closest(
+      'ytd-guide-entry-renderer'
+    );
+    if (sidebarShortsItem) {
+      sidebarShortsItem.style.display = 'none';
+    }
+  }
+
+  // Hide shorts in home feed
+  const shortsShelfItems = document.querySelectorAll(
+    'ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts])'
+  );
+  shortsShelfItems.forEach((item) => {
+    item.style.display = 'none';
+  });
+
+  // Check if we're on the shorts page
+  const isOnShortsPage = window.location.pathname.startsWith('/shorts');
+
+  // Remove shorts placeholder if not on shorts page
+  if (!isOnShortsPage) {
+    const shortsPlaceholder = document.querySelector(
+      '.tractube-shorts-placeholder'
+    );
+    if (shortsPlaceholder) {
+      shortsPlaceholder.remove();
+    }
+    return;
+  }
+
+  // If on shorts page, show a placeholder and stop video playback
+  if (isOnShortsPage) {
+    // Create placeholder if it doesn't exist
+    let shortsPlaceholder = document.querySelector(
+      '.tractube-shorts-placeholder'
+    );
+    if (!shortsPlaceholder) {
+      shortsPlaceholder = document.createElement('div');
+      shortsPlaceholder.className = 'tractube-shorts-placeholder';
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'tractube-shorts-message';
+
+      const heading = document.createElement('h2');
+      heading.textContent = 'Shorts Hidden';
+
+      const paragraph1 = document.createElement('p');
+      paragraph1.textContent =
+        'Shorts content is hidden to help you stay focused.';
+
+      const paragraph2 = document.createElement('p');
+      paragraph2.textContent =
+        'You can disable this feature in the TracTube extension.';
+
+      messageDiv.appendChild(heading);
+      messageDiv.appendChild(paragraph1);
+      messageDiv.appendChild(paragraph2);
+      shortsPlaceholder.appendChild(messageDiv);
+
+      document.body.appendChild(shortsPlaceholder);
+    }
+
+    // Handle the shorts player and content
+    const shortsContent = document.querySelector('ytd-shorts');
+    if (shortsContent) {
+      // Hide the shorts content
+      shortsContent.style.display = 'none';
+
+      // Find and pause video elements
+      const videoElements = document.querySelectorAll('video');
+      videoElements.forEach((video) => {
+        if (video && !video.paused) {
+          video.pause();
+          // Remove the source to fully stop loading/buffering
+          video.src = '';
+          video.load();
+        }
+      });
+
+      // Also target the player specifically
+      const player = document.querySelector('#shorts-player');
+      if (player) {
+        player.style.display = 'none';
+      }
+
+      // Handle iframe players if present
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach((iframe) => {
+        // Remove src to stop any embedded players
+        if (iframe.src) {
+          iframe.src = '';
+        }
+      });
+    }
+  }
+}
+
+// Helper function to restore shorts visibility
+function restoreShortsVisibility() {
+  // Restore sidebar shorts tab
+  const sidebarShortsTab = document.querySelector(
+    'ytd-guide-entry-renderer a[title="Shorts"]'
+  );
+  if (sidebarShortsTab) {
+    const sidebarShortsItem = sidebarShortsTab.closest(
+      'ytd-guide-entry-renderer'
+    );
+    if (sidebarShortsItem) {
+      sidebarShortsItem.style.display = '';
+    }
+  }
+
+  // Restore shorts in home feed
+  const shortsShelfItems = document.querySelectorAll(
+    'ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts])'
+  );
+  shortsShelfItems.forEach((item) => {
+    item.style.display = '';
+  });
+
+  // Remove shorts placeholder if on shorts page
+  const shortsPlaceholder = document.querySelector(
+    '.tractube-shorts-placeholder'
+  );
+  if (shortsPlaceholder) {
+    shortsPlaceholder.remove();
+  }
+
+  // Restore shorts content visibility
+  if (window.location.pathname.startsWith('/shorts')) {
+    const shortsContent = document.querySelector('ytd-shorts');
+    if (shortsContent) {
+      shortsContent.style.display = '';
+
+      // Restore player visibility
+      const player = document.querySelector('#shorts-player');
+      if (player) {
+        player.style.display = '';
+      }
+
+      // Note: We don't restore video playback as that would be disruptive
+      // The user can refresh the page if they want to view shorts again
+    }
+  }
+}
+
 // Main function to apply all features based on their states
 function applyFeatures() {
   // Only apply features if main toggle is enabled
@@ -101,6 +261,7 @@ function applyFeatures() {
   handleHomeFeed();
   handleTopTags();
   handleThumbnails();
+  handleShorts();
 }
 
 // Function to remove all feature effects
@@ -108,6 +269,12 @@ function removeAllFeatures() {
   // Remove home feed placeholder
   const placeholder = document.querySelector('.tractube-placeholder');
   if (placeholder) placeholder.remove();
+
+  // Remove shorts placeholder
+  const shortsPlaceholder = document.querySelector(
+    '.tractube-shorts-placeholder'
+  );
+  if (shortsPlaceholder) shortsPlaceholder.remove();
 
   // Remove any custom styles
   const style = document.getElementById('tractube-styles');
@@ -140,6 +307,9 @@ function removeAllFeatures() {
     el.classList.remove('tractube-hidden-thumbnail');
   });
 
+  // Restore shorts visibility
+  restoreShortsVisibility();
+
   // Add more element restorations here as more features are implemented
 }
 
@@ -167,20 +337,25 @@ function handleHomeFeed() {
   if (!placeholder) {
     placeholder = document.createElement('div');
     placeholder.className = 'tractube-placeholder';
-    placeholder.innerHTML = `
-      <div style="
-        padding: 2rem;
-        text-align: center;
-        background: var(--yt-spec-brand-background-primary);
-        color: var(--yt-spec-text-primary);
-        border-radius: 12px;
-        margin: 1rem;
-      ">
-        <h2 style="margin-bottom: 1rem;">Home Feed Hidden</h2>
-        <p>Home feed is hidden to help you stay focused.</p>
-        <p>You can disable this feature in the TracTube extension.</p>
-      </div>
-    `;
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'tractube-home-message';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Home Feed Hidden';
+
+    const paragraph1 = document.createElement('p');
+    paragraph1.textContent = 'Home feed is hidden to help you stay focused.';
+
+    const paragraph2 = document.createElement('p');
+    paragraph2.textContent =
+      'You can disable this feature in the TracTube extension.';
+
+    messageDiv.appendChild(heading);
+    messageDiv.appendChild(paragraph1);
+    messageDiv.appendChild(paragraph2);
+    placeholder.appendChild(messageDiv);
+
     feed.parentElement.insertBefore(placeholder, feed);
   }
 
@@ -206,6 +381,9 @@ function handleTopTags() {
   chipsContainer.style.display = 'none';
 }
 
+// Track current URL to detect navigation
+let currentUrl = window.location.href;
+
 // Initial setup
 function initialize() {
   // Load saved states first
@@ -224,10 +402,20 @@ function initialize() {
             node.tagName === 'YTD-RICH-ITEM-RENDERER' ||
             node.tagName === 'YTD-VIDEO-RENDERER' ||
             node.tagName === 'YTD-COMPACT-VIDEO-RENDERER' ||
-            node.tagName === 'YTD-GRID-VIDEO-RENDERER')
+            node.tagName === 'YTD-GRID-VIDEO-RENDERER' ||
+            node.tagName === 'YTD-GUIDE-ENTRY-RENDERER' ||
+            node.tagName === 'YTD-RICH-SECTION-RENDERER' ||
+            node.tagName === 'YTD-SHORTS')
         );
       });
     });
+
+    // Check if URL has changed (navigation occurred)
+    if (currentUrl !== window.location.href) {
+      currentUrl = window.location.href;
+      // Reapply features on navigation
+      applyFeatures();
+    }
 
     if (shouldReapply) {
       applyFeatures();
