@@ -37,6 +37,58 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// Thumbnail selectors
+const thumbnailSelectors = [
+  'ytd-thumbnail', // Main thumbnail selector
+  'ytd-rich-item-renderer ytd-thumbnail', // Home page thumbnails
+  'ytd-video-renderer ytd-thumbnail', // Search results thumbnails
+  'ytd-compact-video-renderer ytd-thumbnail', // Sidebar thumbnails
+  'ytd-grid-video-renderer ytd-thumbnail', // Grid view thumbnails
+];
+
+// Thumbnail Controls Handler
+function handleThumbnails() {
+  if (!featureStates.mainEnabled) return;
+
+  const thumbnails = document.querySelectorAll(thumbnailSelectors.join(', '));
+
+  thumbnails.forEach((thumbnail) => {
+    // Thumbnail blur
+    if (featureStates.blurThumbnails) {
+      thumbnail.classList.add('tractube-blurred-thumbnail');
+    } else {
+      thumbnail.classList.remove('tractube-blurred-thumbnail');
+    }
+
+    // Thumbnail hide
+    if (featureStates.hideThumbnails) {
+      thumbnail.classList.add('tractube-hidden-thumbnail');
+      // Add placeholder only if it doesn't already exist
+      if (
+        !thumbnail.parentElement.querySelector(
+          '.tractube-thumbnail-placeholder'
+        )
+      ) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'tractube-thumbnail-placeholder';
+        placeholder.textContent = 'Thumbnail Hidden';
+        // Add a data attribute to link the placeholder to this thumbnail
+        placeholder.dataset.forThumbnail = true;
+        thumbnail.parentElement.insertBefore(placeholder, thumbnail);
+      }
+    } else {
+      thumbnail.classList.remove('tractube-hidden-thumbnail');
+      // Remove placeholder
+      const placeholder = thumbnail.parentElement.querySelector(
+        '.tractube-thumbnail-placeholder'
+      );
+      if (placeholder) {
+        placeholder.remove();
+      }
+    }
+  });
+}
+
 // Main function to apply all features based on their states
 function applyFeatures() {
   // Only apply features if main toggle is enabled
@@ -48,6 +100,7 @@ function applyFeatures() {
   // Feed Controls
   handleHomeFeed();
   handleTopTags();
+  handleThumbnails();
 }
 
 // Function to remove all feature effects
@@ -71,6 +124,21 @@ function removeAllFeatures() {
     'ytd-feed-filter-chip-bar-renderer'
   );
   if (chipsContainer) chipsContainer.style.display = '';
+
+  // Remove all thumbnail placeholders
+  const thumbnailPlaceholders = document.querySelectorAll(
+    '.tractube-thumbnail-placeholder'
+  );
+  thumbnailPlaceholders.forEach((placeholder) => placeholder.remove());
+
+  // Remove thumbnail-related classes
+  document.querySelectorAll('.tractube-blurred-thumbnail').forEach((el) => {
+    el.classList.remove('tractube-blurred-thumbnail');
+  });
+
+  document.querySelectorAll('.tractube-hidden-thumbnail').forEach((el) => {
+    el.classList.remove('tractube-hidden-thumbnail');
+  });
 
   // Add more element restorations here as more features are implemented
 }
@@ -151,7 +219,12 @@ function initialize() {
         return (
           node.nodeType === 1 &&
           (node.tagName === 'YTD-RICH-GRID-RENDERER' ||
-            node.tagName === 'YTD-FEED-FILTER-CHIP-BAR-RENDERER')
+            node.tagName === 'YTD-FEED-FILTER-CHIP-BAR-RENDERER' ||
+            node.tagName === 'YTD-THUMBNAIL' ||
+            node.tagName === 'YTD-RICH-ITEM-RENDERER' ||
+            node.tagName === 'YTD-VIDEO-RENDERER' ||
+            node.tagName === 'YTD-COMPACT-VIDEO-RENDERER' ||
+            node.tagName === 'YTD-GRID-VIDEO-RENDERER')
         );
       });
     });
