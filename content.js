@@ -249,6 +249,66 @@ function restoreShortsVisibility() {
   }
 }
 
+// Hide Sidebar/Related Videos Handler
+function handleSidebar() {
+  // Skip if we're on the homepage
+  if (window.location.pathname === '/') return;
+
+  if (!featureStates.mainEnabled || !featureStates.hideSidebar) {
+    restoreSidebar();
+    return;
+  }
+
+  // Hide the sidebar and related videos
+  const sidebar = document.querySelector('#secondary');
+  if (sidebar) {
+    // Store sidebar width before hiding
+    const sidebarWidth = sidebar.offsetWidth;
+
+    // Create placeholder with same width
+    const placeholder = document.createElement('div');
+    placeholder.id = 'tractube-sidebar-placeholder';
+    placeholder.style.width = `${sidebarWidth}px`;
+    placeholder.style.flexShrink = '0';
+
+    // Insert placeholder and hide sidebar
+    sidebar.parentNode.insertBefore(placeholder, sidebar);
+    sidebar.style.display = 'none';
+  }
+
+  // Hide end screen recommendations
+  const endScreen = document.querySelector(
+    'ytd-watch-next-secondary-results-renderer'
+  );
+  if (endScreen) {
+    endScreen.style.display = 'none';
+  }
+}
+
+// Helper function to restore sidebar/related videos visibility
+function restoreSidebar() {
+  // Restore sidebar visibility
+  const sidebar = document.querySelector('#secondary');
+  const placeholder = document.querySelector('#tractube-sidebar-placeholder');
+
+  if (sidebar && placeholder) {
+    // Remove placeholder and show sidebar
+    placeholder.remove();
+    sidebar.style.display = '';
+  } else if (sidebar) {
+    // Just show sidebar if no placeholder exists
+    sidebar.style.display = '';
+  }
+
+  // Restore end screen recommendations
+  const endScreen = document.querySelector(
+    'ytd-watch-next-secondary-results-renderer'
+  );
+  if (endScreen) {
+    endScreen.style.display = '';
+  }
+}
+
 // Main function to apply all features based on their states
 function applyFeatures() {
   // Only apply features if main toggle is enabled
@@ -260,8 +320,12 @@ function applyFeatures() {
   // Feed Controls
   handleHomeFeed();
   handleTopTags();
+  // Thumbnails Control
   handleThumbnails();
+  // Shorts Controls
   handleShorts();
+  // Video Controls
+  handleSidebar();
 }
 
 // Function to remove all feature effects
@@ -310,7 +374,8 @@ function removeAllFeatures() {
   // Restore shorts visibility
   restoreShortsVisibility();
 
-  // Add more element restorations here as more features are implemented
+  // Restore sidebar/related videos visibility
+  restoreSidebar();
 }
 
 // Home Feed Handler
