@@ -116,8 +116,11 @@ function initialize() {
     // Check if URL has changed (navigation occurred)
     if (currentUrl !== window.location.href) {
       currentUrl = window.location.href;
-      // Reapply features on navigation
-      applyFeatures();
+
+      // Reapply features on navigation with a slight delay to ensure DOM is ready
+      setTimeout(() => {
+        applyFeatures();
+      }, 100);
     }
 
     if (shouldReapply) {

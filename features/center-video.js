@@ -30,7 +30,6 @@ window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
     !theatreButton ||
     !videoElement
   ) {
-    console.log('early return');
     return;
   }
 
@@ -45,6 +44,9 @@ window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
     // Make header absolute and scroll page
     header.style.position = 'absolute';
     window.scrollTo(0, header.offsetHeight);
+
+    // Trigger a window resize event to make YouTube recalculate video size
+    window.dispatchEvent(new Event('resize'));
   }, 200);
 };
 
@@ -79,7 +81,6 @@ window.TracTube.CenterVideo.scrollVideoIntoViewport = function (featureStates) {
   if (featureStates && featureStates.centerVideo) {
     window.scrollTo(0, header.offsetHeight);
   }
-  console.log('scrollVideoIntoViewport');
 };
 
 // Add event listeners for the center video feature

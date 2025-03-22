@@ -14,20 +14,40 @@ window.TracTube.Sidebar.handleSidebar = function (featureStates) {
 
   // Hide the sidebar and related videos
   const sidebar = document.querySelector('#secondary');
-  if (sidebar) {
-    // Store sidebar width before hiding
-    const sidebarWidth = sidebar.offsetWidth;
-
-    // Create placeholder with same width
-    const placeholder = document.createElement('div');
-    placeholder.id = 'tractube-sidebar-placeholder';
-    placeholder.style.width = `${sidebarWidth}px`;
-    placeholder.style.flexShrink = '0';
-
-    // Insert placeholder and hide sidebar
-    sidebar.parentNode.insertBefore(placeholder, sidebar);
-    sidebar.style.display = 'none';
+  if (!sidebar) {
+    // If sidebar isn't available yet, try again after a short delay
+    setTimeout(() => {
+      window.TracTube.Sidebar.handleSidebar(featureStates);
+    }, 200);
+    return;
   }
+
+  // Check if sidebar is already hidden with a placeholder
+  const existingPlaceholder = document.querySelector(
+    '#tractube-sidebar-placeholder'
+  );
+  if (existingPlaceholder && sidebar.style.display === 'none') {
+    // Already set up correctly, no need to do anything
+    return;
+  }
+
+  // Clean up any existing placeholders to prevent duplicates
+  if (existingPlaceholder) {
+    existingPlaceholder.remove();
+  }
+
+  // Store sidebar width before hiding
+  const sidebarWidth = sidebar.offsetWidth || 400; // Fallback width if offsetWidth is 0
+
+  // Create placeholder with same width
+  const placeholder = document.createElement('div');
+  placeholder.id = 'tractube-sidebar-placeholder';
+  placeholder.style.width = `${sidebarWidth}px`;
+  placeholder.style.flexShrink = '0';
+
+  // Insert placeholder and hide sidebar
+  sidebar.parentNode.insertBefore(placeholder, sidebar);
+  sidebar.style.display = 'none';
 
   // Hide end screen recommendations
   const endScreen = document.querySelector(
@@ -44,13 +64,12 @@ window.TracTube.Sidebar.restoreSidebar = function () {
   const sidebar = document.querySelector('#secondary');
   const placeholder = document.querySelector('#tractube-sidebar-placeholder');
 
-  if (sidebar && placeholder) {
-    // Remove placeholder and show sidebar
+  if (sidebar) {
+    sidebar.style.display = '';
+  }
+
+  if (placeholder) {
     placeholder.remove();
-    sidebar.style.display = '';
-  } else if (sidebar) {
-    // Just show sidebar if no placeholder exists
-    sidebar.style.display = '';
   }
 
   // Restore end screen recommendations
