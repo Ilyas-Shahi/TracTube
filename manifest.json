@@ -15,6 +15,7 @@
         "features/top-tags.js",
         "features/sidebar.js",
         "features/center-video.js",
+        "features/hide-comments.js",
         "content.js"
       ],
       "css": ["styles.css"]

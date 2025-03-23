@@ -64,6 +64,8 @@ function applyFeatures() {
   window.TracTube.Sidebar.handleSidebar(featureStates);
   // Center Video Controls
   window.TracTube.CenterVideo.handleCenterVideo(featureStates);
+  // Comment Controls
+  window.TracTube.HideComments.handleComments(featureStates);
 }
 
 // Function to remove all feature effects
@@ -79,6 +81,7 @@ function removeAllFeatures() {
   window.TracTube.Shorts.restoreShortsVisibility();
   window.TracTube.Sidebar.restoreSidebar();
   window.TracTube.CenterVideo.restoreCenterVideo();
+  window.TracTube.HideComments.restoreComments();
 }
 
 // Track current URL to detect navigation
@@ -108,7 +111,10 @@ function initialize() {
             node.tagName === 'YTD-GRID-VIDEO-RENDERER' ||
             node.tagName === 'YTD-GUIDE-ENTRY-RENDERER' ||
             node.tagName === 'YTD-RICH-SECTION-RENDERER' ||
-            node.tagName === 'YTD-SHORTS')
+            node.tagName === 'YTD-SHORTS' ||
+            node.tagName === 'YTD-COMMENTS' ||
+            node.tagName === 'YTD-COMMENTS-HEADER-RENDERER' ||
+            node.tagName === 'YTD-COMMENT-THREAD-RENDERER')
         );
       });
     });
