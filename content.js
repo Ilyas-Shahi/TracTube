@@ -62,6 +62,8 @@ function applyFeatures() {
   window.TracTube.Shorts.handleShorts(featureStates);
   // Video Controls
   window.TracTube.Sidebar.handleSidebar(featureStates);
+  // Live Chat Controls
+  window.TracTube.LiveChat.handleLiveChat(featureStates);
   // Center Video Controls
   window.TracTube.CenterVideo.handleCenterVideo(featureStates);
   // Comment Controls
@@ -80,6 +82,7 @@ function removeAllFeatures() {
   window.TracTube.Thumbnails.restoreThumbnails();
   window.TracTube.Shorts.restoreShortsVisibility();
   window.TracTube.Sidebar.restoreSidebar();
+  window.TracTube.LiveChat.restoreLiveChat();
   window.TracTube.CenterVideo.restoreCenterVideo();
   window.TracTube.HideComments.restoreComments();
 }
@@ -114,7 +117,10 @@ function initialize() {
             node.tagName === 'YTD-SHORTS' ||
             node.tagName === 'YTD-COMMENTS' ||
             node.tagName === 'YTD-COMMENTS-HEADER-RENDERER' ||
-            node.tagName === 'YTD-COMMENT-THREAD-RENDERER')
+            node.tagName === 'YTD-COMMENT-THREAD-RENDERER' ||
+            node.tagName === 'YTD-LIVE-CHAT-RENDERER' ||
+            node.tagName === 'YTD-LIVE-CHAT-FRAME' ||
+            node.tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER')
         );
       });
     });

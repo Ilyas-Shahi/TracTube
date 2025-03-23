@@ -16,6 +16,7 @@
         "features/sidebar.js",
         "features/center-video.js",
         "features/hide-comments.js",
+        "features/live-chat.js",
         "content.js"
       ],
       "css": ["styles.css"]

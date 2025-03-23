@@ -81,7 +81,8 @@
   font-size: 2.5rem;
 }
 
-/* Comment Hiding */
-.tractube-hide-comments {
+/* Comment / Live Chat Hiding */
+.tractube-hide-comments,
+.tractube-hide-live-chat {
   display: none !important;
 }
