@@ -4,8 +4,15 @@ window.TracTube.CenterVideo = {};
 
 // Center Video Feature
 window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
-  // Skip if we're on the homepage
-  if (window.location.pathname === '/') return;
+  const header = document.querySelector('#masthead-container');
+
+  console.log(window.location.pathname.startsWith('/watch'));
+
+  // Skip if we're on any page other than watch video page
+  if (!window.location.pathname.startsWith('/watch')) {
+    header.style.position = 'fixed';
+    return;
+  }
 
   // Restore center video styles if main or the feature is disabled
   if (!featureStates.mainEnabled || !featureStates.centerVideo) {
@@ -14,7 +21,6 @@ window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
   }
 
   const videoContainer = document.querySelector('#full-bleed-container');
-  const header = document.querySelector('#masthead-container');
   const playerContainer = document.querySelector('ytd-watch-flexy');
   const theatreButton = document.querySelector('button[aria-keyshortcuts="t"]');
   const videoElement = document.querySelector(

@@ -4,16 +4,27 @@ window.TracTube.Thumbnails = {};
 
 // Thumbnail selectors
 window.TracTube.Thumbnails.thumbnailSelectors = [
-  'ytd-thumbnail', // Main thumbnail selector
-  'ytd-rich-item-renderer ytd-thumbnail', // Home page thumbnails
-  'ytd-video-renderer ytd-thumbnail', // Search results thumbnails
-  'ytd-compact-video-renderer ytd-thumbnail', // Sidebar thumbnails
-  'ytd-grid-video-renderer ytd-thumbnail', // Grid view thumbnails
+  // Home page containers
+  '#contents ytd-thumbnail',
+  '#contents ytd-rich-item-renderer ytd-thumbnail',
+
+  // Video page sidebar
+  '#related ytd-thumbnail',
+  '#secondary ytd-compact-video-renderer ytd-thumbnail',
+
+  // Home page shorts shelf
+  // '#contents ytd-rich-shelf-renderer[is-shorts] ytd-thumbnail',
+  'ytm-shorts-lockup-view-model .shortsLockupViewModelHostThumbnailContainer',
 ];
 
 // Thumbnail Controls Handler
 window.TracTube.Thumbnails.handleThumbnails = function (featureStates) {
   if (!featureStates.mainEnabled) return;
+
+  // Only apply to home page or video page
+  const isHomePage = window.location.pathname === '/';
+  const isVideoPage = window.location.pathname.startsWith('/watch');
+  if (!(isHomePage || isVideoPage)) return;
 
   const thumbnails = document.querySelectorAll(
     window.TracTube.Thumbnails.thumbnailSelectors.join(', ')
