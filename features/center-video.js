@@ -6,8 +6,6 @@ window.TracTube.CenterVideo = {};
 window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
   const header = document.querySelector('#masthead-container');
 
-  console.log(window.location.pathname.startsWith('/watch'));
-
   // Skip if we're on any page other than watch video page
   if (!window.location.pathname.startsWith('/watch')) {
     header.style.position = 'fixed';

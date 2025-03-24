@@ -68,6 +68,8 @@ function applyFeatures() {
   window.TracTube.CenterVideo.handleCenterVideo(featureStates);
   // Comment Controls
   window.TracTube.HideComments.handleComments(featureStates);
+  // Autoplay Controls
+  window.TracTube.Autoplay.handleAutoplay(featureStates);
 }
 
 // Function to remove all feature effects
@@ -85,6 +87,7 @@ function removeAllFeatures() {
   window.TracTube.LiveChat.restoreLiveChat();
   window.TracTube.CenterVideo.restoreCenterVideo();
   window.TracTube.HideComments.restoreComments();
+  window.TracTube.Autoplay.restoreAutoplay();
 }
 
 // Track current URL to detect navigation
@@ -120,7 +123,9 @@ function initialize() {
             node.tagName === 'YTD-COMMENT-THREAD-RENDERER' ||
             node.tagName === 'YTD-LIVE-CHAT-RENDERER' ||
             node.tagName === 'YTD-LIVE-CHAT-FRAME' ||
-            node.tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER')
+            node.tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER' ||
+            (node.tagName === 'BUTTON' &&
+              node.dataset.testId === 'autoplay-button'))
         );
       });
     });

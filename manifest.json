@@ -17,6 +17,7 @@
         "features/center-video.js",
         "features/hide-comments.js",
         "features/live-chat.js",
+        "features/autoplay.js",
         "content.js"
       ],
       "css": ["styles.css"]
