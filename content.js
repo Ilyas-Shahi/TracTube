@@ -72,6 +72,12 @@ function applyFeatures() {
   window.TracTube.Autoplay.handleAutoplay(featureStates);
   // Endscreen Controls
   window.TracTube.Endscreen.handleEndscreen(featureStates);
+  // Products Controls
+  window.TracTube.Products.handleProducts(featureStates);
+  // Videowall Controls
+  window.TracTube.Videowall.handleVideowall(featureStates);
+  // Search Results Controls
+  window.TracTube.SearchResults.handleSearchResults(featureStates);
 }
 
 // Function to remove all feature effects
@@ -91,6 +97,9 @@ function removeAllFeatures() {
   window.TracTube.HideComments.restoreComments();
   window.TracTube.Autoplay.restoreAutoplay();
   window.TracTube.Endscreen.restoreEndscreen();
+  window.TracTube.Products.restoreProducts();
+  window.TracTube.Videowall.restoreVideowall();
+  window.TracTube.SearchResults.restoreSearchResults();
 }
 
 // Track current URL to detect navigation
@@ -129,6 +138,18 @@ function initialize() {
             node.tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER' ||
             node.tagName === 'YTD-ENDSCREEN' ||
             node.tagName === 'YTD-ENDSCREEN-RENDERER' ||
+            // Product feature elements
+            node.tagName === 'YTD-PRODUCT-SHELF-RENDERER' ||
+            node.tagName === 'YTD-MERCH-SHELF-RENDERER' ||
+            // Search results feature elements
+            node.tagName === 'YTD-PROMOTED-VIDEO-RENDERER' ||
+            node.tagName === 'YTD-SHELF-RENDERER' ||
+            // Check for elements with specific classes (videowall, product overlays)
+            (node.classList &&
+              (node.classList.contains('html5-endscreen') ||
+                node.classList.contains('ytp-paid-content-overlay') ||
+                node.classList.contains('ytp-paid-product-overlay') ||
+                node.classList.contains('ytp-ce-element'))) ||
             (node.tagName === 'BUTTON' &&
               node.dataset.testId === 'autoplay-button'))
         );

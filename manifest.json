@@ -19,6 +19,9 @@
         "features/live-chat.js",
         "features/autoplay.js",
         "features/endscreen.js",
+        "features/products.js",
+        "features/videowall.js",
+        "features/search-results.js",
         "content.js"
       ],
       "css": ["styles.css"]
