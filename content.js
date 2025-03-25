@@ -70,6 +70,8 @@ function applyFeatures() {
   window.TracTube.HideComments.handleComments(featureStates);
   // Autoplay Controls
   window.TracTube.Autoplay.handleAutoplay(featureStates);
+  // Endscreen Controls
+  window.TracTube.Endscreen.handleEndscreen(featureStates);
 }
 
 // Function to remove all feature effects
@@ -88,6 +90,7 @@ function removeAllFeatures() {
   window.TracTube.CenterVideo.restoreCenterVideo();
   window.TracTube.HideComments.restoreComments();
   window.TracTube.Autoplay.restoreAutoplay();
+  window.TracTube.Endscreen.restoreEndscreen();
 }
 
 // Track current URL to detect navigation
@@ -124,6 +127,8 @@ function initialize() {
             node.tagName === 'YTD-LIVE-CHAT-RENDERER' ||
             node.tagName === 'YTD-LIVE-CHAT-FRAME' ||
             node.tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER' ||
+            node.tagName === 'YTD-ENDSCREEN' ||
+            node.tagName === 'YTD-ENDSCREEN-RENDERER' ||
             (node.tagName === 'BUTTON' &&
               node.dataset.testId === 'autoplay-button'))
         );

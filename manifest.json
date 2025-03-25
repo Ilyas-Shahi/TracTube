@@ -18,6 +18,7 @@
         "features/hide-comments.js",
         "features/live-chat.js",
         "features/autoplay.js",
+        "features/endscreen.js",
         "content.js"
       ],
       "css": ["styles.css"]
