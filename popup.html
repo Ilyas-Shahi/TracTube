@@ -28,6 +28,26 @@
         </label>
       </div>
 
+      <!-- Disable Confirmation -->
+      <div id="confirmationDialogContainer" class="confirmation-container">
+        <div class="confirmation-message">
+          <p>Are you sure you want to get distracted?</p>
+          <p class="countdown">
+            Features will disable in <span id="countdownValue">60</span> seconds
+          </p>
+        </div>
+        <div class="confirmation-buttons">
+          <button id="disableNow" class="confirmation-btn">Disable Now</button>
+          <button id="cancelDisable" class="confirmation-btn">Cancel</button>
+        </div>
+        <div class="confirmation-option">
+          <label>
+            <input type="checkbox" id="dontAskAgain" />
+            Don't ask again
+          </label>
+        </div>
+      </div>
+
       <!-- Timer Section -->
       <div class="timer-section">
         <span class="timer-label">After</span>
@@ -223,6 +243,19 @@
             </label>
           </div>
         </div>
+      </div>
+
+      <!-- Persistent Confirmation Setting -->
+      <div class="confirmation-setting">
+        <label class="switch-container">
+          <span class="switch-label"
+            >Skip confirmation when disabling features</span
+          >
+          <label class="switch">
+            <input type="checkbox" id="persistentDontAskAgain" />
+            <span class="slider"></span>
+          </label>
+        </label>
       </div>
 
       <!-- Footer -->

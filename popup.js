@@ -58,9 +58,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (remaining === 0) {
         clearInterval(timerInterval);
         // Apply the scheduled action (enable/disable) to main toggle
-        mainToggle.checked = action === 'enable';
-        // Trigger change event to update UI and save state
-        mainToggle.dispatchEvent(new Event('change'));
+        // Bypass confirmation for timer-triggered changes
+        if (action === 'enable') {
+          mainToggle.checked = true;
+          featureToggles.forEach((toggle) => (toggle.disabled = false));
+        } else {
+          mainToggle.checked = false;
+          featureToggles.forEach((toggle) => (toggle.disabled = true));
+        }
+        saveStates();
         timerSelect.value = '0';
       }
     }, 1000);
@@ -159,20 +165,40 @@ document.addEventListener('DOMContentLoaded', function () {
   timerAction.addEventListener('change', handleTimerChange);
 
   // Load and restore all toggle states with defaults
-  chrome.storage.sync.get(['mainEnabled', 'toggleStates'], function (result) {
-    // Set main toggle state with default to false using nullish coalescing
-    mainToggle.checked = result.mainEnabled ?? false;
+  chrome.storage.sync.get(
+    ['mainEnabled', 'toggleStates', 'skipConfirmation'],
+    function (result) {
+      // Set persistent "don't ask again" toggle
+      const persistentDontAskAgain = document.getElementById(
+        'persistentDontAskAgain'
+      );
+      persistentDontAskAgain.checked = result.skipConfirmation;
 
-    // Restore individual toggle states if they exist
-    if (result.toggleStates) {
-      featureToggles.forEach((toggle) => {
-        // Set each toggle state with default to false
-        toggle.checked = result.toggleStates[toggle.id] ?? false;
-        // Disable toggle if main toggle is off
-        toggle.disabled = !mainToggle.checked;
+      // Sync with confirmation dialog checkbox
+      persistentDontAskAgain.addEventListener('change', function () {
+        chrome.storage.sync.set({ skipConfirmation: this.checked });
       });
+
+      // Sync confirmation dialog checkbox with persistent setting
+      const dontAskAgain = document.getElementById('dontAskAgain');
+      dontAskAgain.addEventListener('change', function () {
+        persistentDontAskAgain.checked = this.checked;
+        chrome.storage.sync.set({ skipConfirmation: this.checked });
+      });
+      // Set main toggle state with default to false using nullish coalescing
+      mainToggle.checked = result.mainEnabled ?? false;
+
+      // Restore individual toggle states if they exist
+      if (result.toggleStates) {
+        featureToggles.forEach((toggle) => {
+          // Set each toggle state with default to false
+          toggle.checked = result.toggleStates[toggle.id] ?? false;
+          // Disable toggle if main toggle is off
+          toggle.disabled = !mainToggle.checked;
+        });
+      }
     }
-  });
+  );
 
   // Handle section collapsing
   sections.forEach((section) => {
@@ -213,16 +239,96 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Main toggle handler: enables/disables all feature toggles
-  mainToggle.addEventListener('change', function () {
-    const isEnabled = this.checked;
+  // Track confirmation countdown interval
+  let countdownInterval = null;
 
-    // Update disabled state of all feature toggles
+  mainToggle.addEventListener('change', function () {
+    // Clear any existing confirmation countdown
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+    const isEnabled = this.checked;
+    const confirmationContainer = document.getElementById(
+      'confirmationDialogContainer'
+    );
+    const countdownValue = document.getElementById('countdownValue');
+    const disableNowBtn = document.getElementById('disableNow');
+    const cancelDisableBtn = document.getElementById('cancelDisable');
+    const dontAskAgain = document.getElementById('dontAskAgain');
+
+    if (isEnabled) {
+      // Enable features immediately
+      featureToggles.forEach((toggle) => {
+        toggle.disabled = false;
+      });
+      saveStates();
+      confirmationContainer.style.display = 'none';
+    } else {
+      // Check if we should show confirmation
+      chrome.storage.sync.get(['skipConfirmation'], function (result) {
+        const showConfirmation = !result.skipConfirmation;
+
+        if (showConfirmation) {
+          // Show confirmation UI
+          confirmationContainer.style.display = 'block';
+          let countdown = 60;
+          countdownValue.textContent = countdown;
+
+          countdownInterval = setInterval(() => {
+            countdown--;
+            countdownValue.textContent = countdown;
+
+            if (countdown <= 0) {
+              clearInterval(countdownInterval);
+              disableFeatures();
+            }
+          }, 1000);
+
+          // Handle disable now button
+          disableNowBtn.onclick = () => {
+            clearInterval(countdownInterval);
+            disableFeatures();
+          };
+
+          // Handle cancel button
+          cancelDisableBtn.onclick = () => {
+            clearInterval(countdownInterval);
+            confirmationContainer.style.display = 'none';
+            mainToggle.checked = true; // Reset toggle to enabled
+          };
+
+          // Initialize and handle don't ask again checkbox
+          dontAskAgain.checked = persistentDontAskAgain.checked;
+          dontAskAgain.onchange = (e) => {
+            persistentDontAskAgain.checked = e.target.checked;
+            chrome.storage.sync.set({ skipConfirmation: e.target.checked });
+            if (e.target.checked) {
+              clearInterval(countdownInterval);
+              disableFeatures();
+            }
+          };
+        } else {
+          // Skip confirmation if disabled
+          disableFeatures();
+        }
+      });
+    }
+  });
+
+  function disableFeatures() {
+    const confirmationContainer = document.getElementById(
+      'confirmationDialogContainer'
+    );
+    confirmationContainer.style.display = 'none';
+
+    // Disable all feature toggles
     featureToggles.forEach((toggle) => {
-      toggle.disabled = !isEnabled;
+      toggle.disabled = true;
     });
 
     saveStates();
-  });
+  }
 
   // Add change listeners to all feature toggles for state persistence
   featureToggles.forEach((toggle) => {
