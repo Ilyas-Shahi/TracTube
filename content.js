@@ -56,6 +56,7 @@ function applyFeatures() {
   // Feed Controls
   window.TracTube.HomeFeed.handleHomeFeed(featureStates);
   window.TracTube.TopTags.handleTopTags(featureStates);
+  window.TracTube.HideSubscriptions.handleSubscriptions(featureStates);
   // Thumbnails Control
   window.TracTube.Thumbnails.handleThumbnails(featureStates);
   // Shorts Controls
@@ -100,6 +101,7 @@ function removeAllFeatures() {
   window.TracTube.Products.restoreProducts();
   window.TracTube.Videowall.restoreVideowall();
   window.TracTube.SearchResults.restoreSearchResults();
+  window.TracTube.HideSubscriptions.restoreSubscriptions();
 }
 
 // Track current URL to detect navigation

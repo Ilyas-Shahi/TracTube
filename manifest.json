@@ -22,6 +22,7 @@
         "features/products.js",
         "features/videowall.js",
         "features/search-results.js",
+        "features/hide-subscriptions.js",
         "content.js"
       ],
       "css": ["styles.css"]
