@@ -4,6 +4,9 @@ window.TracTube.TopTags = {};
 
 // Top Tags Handler
 window.TracTube.TopTags.handleTopTags = function (featureStates) {
+  // Only hide tags on homepage
+  if (window.location.pathname !== '/') return;
+
   // Target the chips container
   const chipsContainer = document.querySelector(
     'ytd-feed-filter-chip-bar-renderer'

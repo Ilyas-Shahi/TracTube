@@ -7,12 +7,12 @@
 .tractube-blurred-thumbnail img {
   filter: grayscale(0.8) blur(20px);
   transform: scale(1.1);
-  transition: filter 0.3s ease, transform 0.3s ease;
+  transition: filter 0.5s ease 0.5s, transform 0.5s ease 0.5s;
 }
 
 /* Hover effect to temporarily reveal blurred thumbnails */
 .tractube-blurred-thumbnail:hover img {
-  filter: blur(0px);
+  filter: grayscale(0) blur(0px);
   transform: scale(1.05);
 }
 

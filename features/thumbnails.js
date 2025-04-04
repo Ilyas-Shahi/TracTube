@@ -24,7 +24,10 @@ window.TracTube.Thumbnails.handleThumbnails = function (featureStates) {
   // Only apply to home page or video page
   const isHomePage = window.location.pathname === '/';
   const isVideoPage = window.location.pathname.startsWith('/watch');
-  if (!(isHomePage || isVideoPage)) return;
+  if (!(isHomePage || isVideoPage)) {
+    this.restoreThumbnails();
+    return;
+  }
 
   const thumbnails = document.querySelectorAll(
     window.TracTube.Thumbnails.thumbnailSelectors.join(', ')

@@ -32,6 +32,47 @@ window.TracTube.Shorts.handleShorts = function (featureStates) {
     item.style.display = 'none';
   });
 
+  // Hide shorts in search results (check for SHORTS badge overlay)
+  const searchShorts = document.querySelectorAll(
+    'ytd-video-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"])'
+  );
+  searchShorts.forEach((short) => {
+    short.style.display = 'none';
+  });
+
+  // Hide shorts shelf in search results
+  const searchShortsShelves = document.querySelectorAll(
+    'ytd-reel-shelf-renderer'
+  );
+  searchShortsShelves.forEach((shelf) => {
+    shelf.style.display = 'none';
+  });
+
+  // working above but not below
+
+  // Only run channel-specific hiding on channel pages
+  if (
+    window.location.pathname.startsWith('/c/') ||
+    window.location.pathname.startsWith('/channel/') ||
+    window.location.pathname.startsWith('/@')
+  ) {
+    // Hide shorts tab in channel
+    const channelShortsTab = document.querySelector(
+      'yt-tab-shape[tab-title="Shorts"]'
+    );
+    if (channelShortsTab) {
+      channelShortsTab.style.display = 'none';
+    }
+
+    // Hide shorts shelves in channel
+    const channelShortsShelves = document.querySelectorAll(
+      'ytd-item-section-renderer:has(ytd-reel-shelf-renderer)'
+    );
+    channelShortsShelves.forEach((shelf) => {
+      shelf.style.display = 'none';
+    });
+  }
+
   // Check if we're on the shorts page
   const isOnShortsPage = window.location.pathname.startsWith('/shorts');
 
@@ -134,6 +175,46 @@ window.TracTube.Shorts.restoreShortsVisibility = function () {
   );
   shortsShelfItems.forEach((item) => {
     item.style.display = '';
+  });
+
+  // Restore shorts in search results (matching the SHORTS badge overlay)
+  const searchShorts = document.querySelectorAll(
+    'ytd-video-renderer:has(ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"])'
+  );
+  searchShorts.forEach((short) => {
+    short.style.display = '';
+  });
+
+  // Restore shorts shelves in search results
+  const searchShortsShelves = document.querySelectorAll(
+    'ytd-reel-shelf-renderer'
+  );
+  searchShortsShelves.forEach((shelf) => {
+    shelf.style.display = '';
+  });
+
+  // Restore shorts tab in channel
+  const channelShortsTab = document.querySelector(
+    'yt-tab-shape[tab-title="Shorts"]'
+  );
+  if (channelShortsTab) {
+    channelShortsTab.style.display = '';
+  }
+
+  // Restore shorts in channel pages
+  const channelShorts = document.querySelectorAll(
+    'ytd-grid-video-renderer:has(a[href^="/shorts/"])'
+  );
+  channelShorts.forEach((short) => {
+    short.style.display = '';
+  });
+
+  // Restore shorts shelves in channel pages
+  const channelShortsShelves = document.querySelectorAll(
+    'ytd-item-section-renderer:has(ytd-reel-shelf-renderer)'
+  );
+  channelShortsShelves.forEach((shelf) => {
+    shelf.style.display = '';
   });
 
   // Remove shorts placeholder if on shorts page
