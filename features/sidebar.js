@@ -4,36 +4,25 @@ window.TracTube.Sidebar = {};
 
 // Hide Sidebar/Related Videos Handler
 window.TracTube.Sidebar.handleSidebar = function (featureStates) {
-  // Skip if we're on the homepage
-  if (window.location.pathname === '/') return;
-
-  if (!featureStates.mainEnabled || !featureStates.hideSidebar) {
+  // Skip if, main toggle or feature toggle disabled or not on video watch page
+  if (
+    !featureStates.mainEnabled ||
+    !featureStates.hideSidebar ||
+    !window.location.pathname.startsWith('/watch')
+  ) {
     window.TracTube.Sidebar.restoreSidebar();
     return;
   }
 
   // Hide the sidebar and related videos
-  const sidebar = document.querySelector('#secondary');
-  if (!sidebar) {
-    // If sidebar isn't available yet, try again after a short delay
-    setTimeout(() => {
-      window.TracTube.Sidebar.handleSidebar(featureStates);
-    }, 200);
-    return;
-  }
+  const sidebar = document.querySelector('#related');
 
   // Check if sidebar is already hidden with a placeholder
   const existingPlaceholder = document.querySelector(
     '#tractube-sidebar-placeholder'
   );
-  if (existingPlaceholder && sidebar.style.display === 'none') {
-    // Already set up correctly, no need to do anything
-    return;
-  }
-
-  // Clean up any existing placeholders to prevent duplicates
-  if (existingPlaceholder) {
-    existingPlaceholder.remove();
+  if (existingPlaceholder || sidebar.style.display === 'none') {
+    return; // Already processed
   }
 
   // Store sidebar width before hiding
@@ -48,20 +37,12 @@ window.TracTube.Sidebar.handleSidebar = function (featureStates) {
   // Insert placeholder and hide sidebar
   sidebar.parentNode.insertBefore(placeholder, sidebar);
   sidebar.style.display = 'none';
-
-  // Hide end screen recommendations
-  const endScreen = document.querySelector(
-    'ytd-watch-next-secondary-results-renderer'
-  );
-  if (endScreen) {
-    endScreen.style.display = 'none';
-  }
 };
 
 // Helper function to restore sidebar/related videos visibility
 window.TracTube.Sidebar.restoreSidebar = function () {
   // Restore sidebar visibility
-  const sidebar = document.querySelector('#secondary');
+  const sidebar = document.querySelector('#related');
   const placeholder = document.querySelector('#tractube-sidebar-placeholder');
 
   if (sidebar) {
@@ -70,13 +51,5 @@ window.TracTube.Sidebar.restoreSidebar = function () {
 
   if (placeholder) {
     placeholder.remove();
-  }
-
-  // Restore end screen recommendations
-  const endScreen = document.querySelector(
-    'ytd-watch-next-secondary-results-renderer'
-  );
-  if (endScreen) {
-    endScreen.style.display = '';
   }
 };
