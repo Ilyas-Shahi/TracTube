@@ -112,8 +112,10 @@ function initialize() {
   // Load saved states first
   loadSavedStates();
 
-  // Set up event listeners for center video feature
-  window.TracTube.CenterVideo.setupCenterVideoEventListeners();
+  // Set up event listeners for center video feature if on watch page
+  if (window.location.pathname.startsWith('/watch')) {
+    window.TracTube.CenterVideo.setupCenterVideoEventListeners();
+  }
 
   // Add mutation observer for dynamic content
   const observer = new MutationObserver((mutations) => {
@@ -195,6 +197,10 @@ function initialize() {
         if (loadingBar && loadingBar.getAttribute('aria-valuenow') === '100') {
           // Loading finished, apply features
           applyFeatures();
+          // Setup video listeners if navigated to watch page
+          if (window.location.pathname.startsWith('/watch')) {
+            window.TracTube.CenterVideo.setupCenterVideoEventListeners();
+          }
         } else {
           // Loading still in progress, check again
           requestAnimationFrame(waitForNavigation);

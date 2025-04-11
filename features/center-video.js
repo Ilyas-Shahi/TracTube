@@ -2,6 +2,9 @@
 window.TracTube = window.TracTube || {};
 window.TracTube.CenterVideo = {};
 
+// Track if our feature enabled theater mode
+window.TracTube.CenterVideo.centerVideoActive = false;
+
 // Center Video Feature
 window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
   const header = document.querySelector('#masthead-container');
@@ -48,6 +51,8 @@ window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
 
   if (!playerContainer.hasAttribute('theater')) {
     theatreButton.click();
+    window.TracTube.CenterVideo.centerVideoActive = true;
+    chrome.storage.sync.set({ centerVideoActive: true });
   }
 
   // increase video container size to cover viewport
@@ -65,27 +70,51 @@ window.TracTube.CenterVideo.restoreCenterVideo = function () {
   const playerContainer = document.querySelector('ytd-watch-flexy');
   const videoContainer = document.querySelector('#full-bleed-container');
   const header = document.querySelector('#masthead-container');
+  const theaterButton = document.querySelector('button[aria-keyshortcuts="t"]');
 
   // Check if elements exist before modifying
   if (!header) return;
 
+  // Always reset header position immediately
   header.style.position = 'fixed';
 
-  // Reset theater mode if needed
-  if (playerContainer && videoContainer) {
-    const theaterButton = document.querySelector(
-      'button[aria-keyshortcuts="t"]'
-    );
-
-    if (theaterButton && playerContainer.hasAttribute('theater')) {
-      theaterButton.click();
+  // Reset video container size based on current theater mode state
+  if (videoContainer) {
+    if (
+      playerContainer &&
+      playerContainer.hasAttribute('theater') &&
+      videoContainer.style.maxHeight !== 'calc(100vh - 169px)'
+    ) {
+      // If in theater mode, use theater mode size
       videoContainer.style.maxHeight = 'calc(100vh - 169px)';
+      window.dispatchEvent(new Event('resize'));
+    } else {
+      // If not in theater mode, remove maxHeight restriction
+      videoContainer.style.maxHeight = '';
     }
+  }
+
+  // Reset theater mode only if our feature enabled it
+  if (
+    playerContainer &&
+    theaterButton &&
+    playerContainer.hasAttribute('theater')
+  ) {
+    const shouldReset = window.TracTube.CenterVideo.centerVideoActive;
+    window.TracTube.CenterVideo.centerVideoActive = false;
+    chrome.storage.sync.get(['centerVideoActive'], (result) => {
+      if (shouldReset || result.centerVideoActive) {
+        theaterButton.click();
+      }
+      chrome.storage.sync.remove('centerVideoActive');
+    });
   }
 };
 
 window.TracTube.CenterVideo.scrollVideoIntoViewport = function (featureStates) {
   if (document.fullscreenElement !== null) return;
+
+  console.log('scrollVideoIntoViewport');
 
   const header = document.querySelector('#masthead-container');
   if (
@@ -103,15 +132,35 @@ window.TracTube.CenterVideo.scrollVideoIntoViewport = function (featureStates) {
 
 // Add event listeners for the center video feature
 window.TracTube.CenterVideo.setupCenterVideoEventListeners = function () {
-  const video = document.querySelector('#full-bleed-container video');
+  if (!window.location.pathname.startsWith('/watch')) return;
 
-  if (video) {
-    video.addEventListener('play', () =>
-      window.TracTube.CenterVideo.scrollVideoIntoViewport(window.featureStates)
-    );
-  }
-
+  // Setup fullscreen change listener
   document.addEventListener('fullscreenchange', () =>
     window.TracTube.CenterVideo.scrollVideoIntoViewport(window.featureStates)
   );
+
+  // Create observer to watch for video element
+  const observer = new MutationObserver((mutations, obs) => {
+    const video = document.querySelector('#full-bleed-container video');
+    console.log(video);
+    if (video) {
+      video.addEventListener('play', () =>
+        window.TracTube.CenterVideo.scrollVideoIntoViewport(
+          window.featureStates
+        )
+      );
+      obs.disconnect(); // Stop observing once we find the video
+    }
+  });
+
+  // Start observing with a timeout
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  // Set timeout to stop observing after 10 seconds
+  setTimeout(() => {
+    observer.disconnect();
+  }, 10000);
 };
