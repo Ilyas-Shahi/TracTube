@@ -96,3 +96,8 @@
   width: 0 !important;
   pointer-events: none !important;
 }
+
+/* End Video Wall */
+.tractube-hide-videowall {
+  display: none !important;
+}

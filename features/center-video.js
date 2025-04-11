@@ -37,6 +37,15 @@ window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
     return;
   }
 
+  // Return if feature already applied
+  if (
+    playerContainer.hasAttribute('theater') &&
+    videoContainer.style.maxHeight === '100vh' &&
+    header.style.position === 'absolute'
+  ) {
+    return;
+  }
+
   if (!playerContainer.hasAttribute('theater')) {
     theatreButton.click();
   }
@@ -44,14 +53,12 @@ window.TracTube.CenterVideo.handleCenterVideo = function (featureStates) {
   // increase video container size to cover viewport
   videoContainer.style.maxHeight = '100vh';
 
-  setTimeout(() => {
-    // Make header absolute and scroll page
-    header.style.position = 'absolute';
-    window.scrollTo(0, header.offsetHeight);
+  // Make header absolute and scroll page
+  header.style.position = 'absolute';
+  window.scrollTo(0, header.offsetHeight);
 
-    // Trigger a window resize event to make YouTube recalculate video size
-    window.dispatchEvent(new Event('resize'));
-  }, 200);
+  // Trigger a window resize event to make YouTube recalculate video size
+  window.dispatchEvent(new Event('resize'));
 };
 
 window.TracTube.CenterVideo.restoreCenterVideo = function () {
@@ -81,17 +88,25 @@ window.TracTube.CenterVideo.scrollVideoIntoViewport = function (featureStates) {
   if (document.fullscreenElement !== null) return;
 
   const header = document.querySelector('#masthead-container');
-
-  if (featureStates && featureStates.centerVideo) {
-    window.scrollTo(0, header.offsetHeight);
+  if (
+    header &&
+    header.offsetHeight > 0 &&
+    featureStates &&
+    featureStates.centerVideo
+  ) {
+    window.scrollTo({
+      top: header.offsetHeight,
+      behavior: 'smooth',
+    });
   }
 };
 
 // Add event listeners for the center video feature
 window.TracTube.CenterVideo.setupCenterVideoEventListeners = function () {
-  const fullBleedContainer = document.querySelector('#full-bleed-container');
-  if (fullBleedContainer) {
-    fullBleedContainer.addEventListener('click', () =>
+  const video = document.querySelector('#full-bleed-container video');
+
+  if (video) {
+    video.addEventListener('play', () =>
       window.TracTube.CenterVideo.scrollVideoIntoViewport(window.featureStates)
     );
   }
