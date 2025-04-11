@@ -119,57 +119,88 @@ function initialize() {
   const observer = new MutationObserver((mutations) => {
     // Only reapply features if relevant DOM changes occur
     const shouldReapply = mutations.some((mutation) => {
+      // Check for added nodes
       return Array.from(mutation.addedNodes).some((node) => {
+        if (node.nodeType !== 1) return false;
+
+        const tagName = node.tagName;
+        const classList = node.classList;
+
         return (
-          node.nodeType === 1 &&
-          (node.tagName === 'YTD-RICH-GRID-RENDERER' ||
-            node.tagName === 'YTD-FEED-FILTER-CHIP-BAR-RENDERER' ||
-            node.tagName === 'YTD-THUMBNAIL' ||
-            node.tagName === 'YTD-RICH-ITEM-RENDERER' ||
-            node.tagName === 'YTD-VIDEO-RENDERER' ||
-            node.tagName === 'YTD-COMPACT-VIDEO-RENDERER' ||
-            node.tagName === 'YTD-GRID-VIDEO-RENDERER' ||
-            node.tagName === 'YTD-GUIDE-ENTRY-RENDERER' ||
-            node.tagName === 'YTD-RICH-SECTION-RENDERER' ||
-            node.tagName === 'YTD-SHORTS' ||
-            node.tagName === 'YTD-COMMENTS' ||
-            node.tagName === 'YTD-COMMENTS-HEADER-RENDERER' ||
-            node.tagName === 'YTD-COMMENT-THREAD-RENDERER' ||
-            node.tagName === 'YTD-LIVE-CHAT-RENDERER' ||
-            node.tagName === 'YTD-LIVE-CHAT-FRAME' ||
-            node.tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER' ||
-            node.tagName === 'YTD-ENDSCREEN' ||
-            node.tagName === 'YTD-ENDSCREEN-RENDERER' ||
-            // Product feature elements
-            node.tagName === 'YTD-PRODUCT-SHELF-RENDERER' ||
-            node.tagName === 'YTD-MERCH-SHELF-RENDERER' ||
-            // Search results feature elements
-            node.tagName === 'YTD-PROMOTED-VIDEO-RENDERER' ||
-            node.tagName === 'YTD-SHELF-RENDERER' ||
-            // Check for elements with specific classes (videowall, product overlays)
-            (node.classList &&
-              (node.classList.contains('html5-endscreen') ||
-                node.classList.contains('ytp-paid-content-overlay') ||
-                node.classList.contains('ytp-paid-product-overlay') ||
-                node.classList.contains('ytp-ce-element'))) ||
-            (node.tagName === 'BUTTON' &&
-              node.dataset.testId === 'autoplay-button'))
+          // Feed and content elements
+          tagName === 'YTD-RICH-GRID-RENDERER' ||
+          tagName === 'YTD-RICH-ITEM-RENDERER' ||
+          tagName === 'YTD-RICH-SECTION-RENDERER' ||
+          tagName === 'YTD-SHELF-RENDERER' ||
+          // Thumbnails and video elements
+          tagName === 'YTD-THUMBNAIL' ||
+          tagName === 'YTD-VIDEO-RENDERER' ||
+          tagName === 'YTD-GRID-VIDEO-RENDERER' ||
+          tagName === 'YTD-COMPACT-VIDEO-RENDERER' ||
+          tagName === 'YTD-PLAYLIST-RENDERER' ||
+          // Shorts elements
+          tagName === 'YTD-SHORTS' ||
+          tagName === 'YTD-REEL-SHELF-RENDERER' ||
+          tagName === 'YTD-SHORTS-SHELF-RENDERER' ||
+          // Navigation and filter elements
+          tagName === 'YTD-FEED-FILTER-CHIP-BAR-RENDERER' ||
+          tagName === 'YTD-GUIDE-ENTRY-RENDERER' ||
+          // Comments elements
+          tagName === 'YTD-COMMENTS' ||
+          tagName === 'YTD-COMMENTS-HEADER-RENDERER' ||
+          tagName === 'YTD-COMMENT-THREAD-RENDERER' ||
+          // Live chat elements
+          tagName === 'YTD-LIVE-CHAT-FRAME' ||
+          tagName === 'YTD-LIVE-CHAT-RENDERER' ||
+          tagName === 'YT-LIVE-CHAT-ITEM-LIST-RENDERER' ||
+          // Endscreen and product elements
+          tagName === 'YTD-ENDSCREEN-RENDERER' ||
+          tagName === 'YTD-ENDSCREEN' ||
+          tagName === 'YTD-PRODUCT-RENDERER' ||
+          tagName === 'YTD-PRODUCT-SHELF-RENDERER' ||
+          tagName === 'YTD-MERCH-RENDERER' ||
+          tagName === 'YTD-MERCH-SHELF-RENDERER' ||
+          // Class-based checks
+          (classList &&
+            (classList.contains('ytd-shorts') ||
+              classList.contains('shorts-shelf') ||
+              classList.contains('ytd-thumbnail-container') ||
+              classList.contains('html5-endscreen') ||
+              classList.contains('ytp-endscreen') ||
+              classList.contains('ytp-ce-element') ||
+              classList.contains('ytp-paid-content-overlay') ||
+              classList.contains('ytp-paid-product-overlay') ||
+              classList.contains('ytd-merch-shelf') ||
+              classList.contains('ytd-product-shelf') ||
+              classList.contains('ytp-autoplay-button'))) ||
+          // Special cases
+          (tagName === 'BUTTON' && node.dataset.testId === 'autoplay-button')
         );
       });
     });
+
+    if (shouldReapply) {
+      applyFeatures();
+    }
 
     // Check if URL has changed (navigation occurred)
     if (currentUrl !== window.location.href) {
       currentUrl = window.location.href;
 
-      // Reapply features on navigation with a slight delay to ensure DOM is ready
-      setTimeout(() => {
-        applyFeatures();
-      }, 100);
-    }
-
-    if (shouldReapply) {
-      applyFeatures();
+      // Watch for YouTube's loading bar progress to detect when navigation is complete
+      const waitForNavigation = () => {
+        const loadingBar = document.querySelector(
+          'yt-page-navigation-progress'
+        );
+        if (loadingBar && loadingBar.getAttribute('aria-valuenow') === '100') {
+          // Loading finished, apply features
+          applyFeatures();
+        } else {
+          // Loading still in progress, check again
+          requestAnimationFrame(waitForNavigation);
+        }
+      };
+      waitForNavigation();
     }
   });
 

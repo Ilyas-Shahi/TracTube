@@ -23,7 +23,7 @@ window.TracTube.Products.handleProducts = function (featureStates) {
 
   this.selectors.forEach((selector) => {
     document.querySelectorAll(selector).forEach((el) => {
-      el.style.display = 'none';
+      el.classList.add('tractube-hidden-product');
     });
   });
 };
@@ -32,7 +32,7 @@ window.TracTube.Products.handleProducts = function (featureStates) {
 window.TracTube.Products.restoreProducts = function () {
   this.selectors.forEach((selector) => {
     document.querySelectorAll(selector).forEach((el) => {
-      el.style.display = '';
+      el.classList.remove('tractube-hidden-product');
     });
   });
 };

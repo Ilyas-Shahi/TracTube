@@ -86,3 +86,13 @@
 .tractube-hide-live-chat {
   display: none !important;
 }
+
+/* Product Controls */
+.tractube-hidden-product {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  pointer-events: none !important;
+}

@@ -11,7 +11,11 @@ window.TracTube.SearchResults.selectors = [
 
 // Handle search results visibility
 window.TracTube.SearchResults.handleSearchResults = function (featureStates) {
-  if (!featureStates.mainEnabled || !featureStates.hideIrrelevantSearch) {
+  if (
+    !featureStates.mainEnabled ||
+    !featureStates.hideIrrelevantSearch ||
+    !window.location.pathname.startsWith('/results')
+  ) {
     this.restoreSearchResults();
     return;
   }
