@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TracTube",
   "version": "1.0",
-  "description": "Tractube - Distraction free youtube",
+  "description": "Tractube - Distraction Free Focused YouTube",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["https://*.youtube.com/*"],
   "content_scripts": [

@@ -17,16 +17,22 @@ window.TracTube.HideSubscriptions.handleSubscriptions = function (
     '#guide #items ytd-guide-entry-renderer:has([title="Subscriptions"])'
   );
 
-  if (!subsTab) {
-    // If not found, try again after short delay
-    // setTimeout(() => {
-    //   this.handleSubscriptions(featureStates);
-    // }, 200);
-    return;
+  if (subsTab) {
+    // Hide the subscriptions tab
+    subsTab.style.display = 'none';
   }
 
-  // Hide the subscriptions tab
-  subsTab.style.display = 'none';
+  // Get subscriptions section in sidebar
+  const subscriptionsSection = Array.from(
+    document.querySelectorAll(
+      'ytd-guide-section-renderer:has(h3.ytd-guide-section-renderer > yt-formatted-string#guide-section-title)'
+    )
+  ).find((e) => e.textContent.includes('All subscriptions'));
+
+  if (subscriptionsSection) {
+    // Hide the subscriptions section in the sidebar
+    subscriptionsSection.style.display = 'none';
+  }
 
   // Navigate to home if currently on subscriptions page
   if (window.location.pathname.startsWith('/feed/subscriptions')) {
@@ -41,5 +47,17 @@ window.TracTube.HideSubscriptions.restoreSubscriptions = function () {
   );
   if (subsTab) {
     subsTab.style.display = '';
+  }
+
+  // Get subscriptions section in sidebar
+  const subscriptionsSection = Array.from(
+    document.querySelectorAll(
+      'ytd-guide-section-renderer:has(h3.ytd-guide-section-renderer > yt-formatted-string#guide-section-title)'
+    )
+  ).find((e) => e.textContent.includes('All subscriptions'));
+
+  if (subscriptionsSection) {
+    // Hide the subscriptions section in the sidebar
+    subscriptionsSection.style.display = '';
   }
 };
